@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="ja" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>G検定 完全単語帳｜リアルタイム検索辞書（全721語）</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Noto+Sans+JP:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" crossorigin="anonymous" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="workspace">
+    <!-- =================================================================
+         LEFT PANE: Sticky Search & Filter Sidebar
+         ================================================================= -->
+    <aside class="sidebar" aria-label="検索とフィルタ">
+      <div class="sidebar-header">
+        <div class="brand">
+          <div class="brand-mark" aria-hidden="true">G</div>
+          <div class="brand-text">
+            <h1>G検定 完全単語帳</h1>
+            <span class="version-badge" id="metaBadge">第10版・全721語</span>
+          </div>
+        </div>
+        <div class="sidebar-header-tools">
+          <button type="button" class="tool-icon-btn" id="studyModeBtn" aria-pressed="false" title="暗記モード：キーワード・解説を隠して見出しだけで確認">
+            <span aria-hidden="true">🧠</span>
+          </button>
+          <button type="button" class="tool-icon-btn" id="themeToggleBtn" aria-label="ダークモード切替" title="テーマ切替（ライト／ダーク）">
+            <span id="themeIcon" aria-hidden="true">🌙</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- View Switcher -->
+      <nav class="view-tabs" aria-label="表示切替">
+        <button type="button" class="view-tab is-active" data-view="glossary" id="tabGlossary">
+          <span>辞書一覧</span>
+          <span class="tab-count" id="tabGlossaryCount">721</span>
+        </button>
+        <button type="button" class="view-tab" data-view="appendix" id="tabAppendix">
+          <span>混同比較</span>
+          <span class="tab-count" id="tabAppendixCount">53</span>
+        </button>
+      </nav>
+
+      <!-- Real-Time Search Box -->
+      <div class="search-section">
+        <label for="searchInput" class="sr-only">辞書をリアルタイム検索</label>
+        <div class="search-box-wrap">
+          <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+          <input
+            type="search"
+            id="searchInput"
+            class="search-input"
+            placeholder="ワード・解説を検索（例：CNN）"
+            autocomplete="off"
+            spellcheck="false"
+          />
+          <button type="button" class="search-clear-btn" id="clearSearchBtn" aria-label="検索をクリア" hidden>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
+          <kbd class="search-kbd" id="searchKbd" title="'/' キーで検索欄へフォーカス">/</kbd>
+        </div>
+
+        <div class="search-meta-line">
+          <span class="search-live-badge" id="liveCountBadge" aria-live="polite">721語</span>
+          <span class="search-hint-text">AND検索・かな/全半角自動吸収</span>
+        </div>
+
+        <!-- Quick try examples -->
+        <div class="quick-queries" id="quickQueries">
+          <button type="button" class="quick-chip" data-query="CNN">CNN</button>
+          <button type="button" class="quick-chip" data-query="Transformer">Transformer</button>
+          <button type="button" class="quick-chip" data-query="サポートベクタ">サポートベクタ</button>
+          <button type="button" class="quick-chip" data-query="KLダイバージェンス">KLダイバージェンス</button>
+          <button type="button" class="quick-chip" data-query="著作権">著作権</button>
+          <button type="button" class="quick-chip" data-query="AI推進法">AI推進法</button>
+          <button type="button" class="quick-chip" data-query="過学習">過学習</button>
+        </div>
+      </div>
+
+      <!-- Scrollable Filter Body -->
+      <div class="sidebar-scroll" id="glossarySidebarFilters">
+        <!-- Search Scope -->
+        <div class="filter-block" id="scopeGroup">
+          <div class="filter-title">検索対象</div>
+          <div class="chip-grid cols-2" role="group" aria-label="検索対象">
+            <button type="button" class="pill-btn is-active" data-scope="all">すべて</button>
+            <button type="button" class="pill-btn" data-scope="heading">見出し・別名</button>
+            <button type="button" class="pill-btn" data-scope="keywords">キーワード</button>
+            <button type="button" class="pill-btn" data-scope="pitfalls">混同注意</button>
+          </div>
+        </div>
+
+        <!-- Learning Status & Progress -->
+        <div class="filter-block" id="statusGroup">
+          <div class="filter-title-row">
+            <span class="filter-title">学習ステータス</span>
+            <span class="progress-inline">習得 <strong id="masteredStat">0/721</strong></span>
+          </div>
+          <div class="progress-bar-track"><span class="progress-bar-fill" id="masteredBar"></span></div>
+          <div class="chip-grid cols-2" role="group" aria-label="学習ステータス">
+            <button type="button" class="pill-btn is-active" data-status="all">全語</button>
+            <button type="button" class="pill-btn" data-status="bookmarked">★ 要復習 <span class="mini-count" id="bookmarkCount">0</span></button>
+            <button type="button" class="pill-btn" data-status="unmastered">未習得</button>
+            <button type="button" class="pill-btn" data-status="mastered">✓ 習得済</button>
+          </div>
+        </div>
+
+        <!-- Chapter Filter List -->
+        <div class="filter-block">
+          <div class="filter-title-row">
+            <span class="filter-title">章フィルタ</span>
+            <button type="button" class="text-reset-btn" id="resetFiltersBtn" hidden>リセット</button>
+          </div>
+          <div class="chapter-list" id="chapterStrip" role="group" aria-label="章フィルタ"></div>
+        </div>
+      </div>
+
+      <!-- Appendix Sidebar Hint (shown only on appendix tab) -->
+      <div class="sidebar-scroll appendix-sidebar-note" id="appendixSidebarNote" hidden>
+        <div class="filter-block">
+          <div class="filter-title">混同比較早見表（全53テーマ）</div>
+          <p class="sidebar-note-text">
+            G検定の選択肢でひっかけられやすい「似ているが役割・条件が異なるペア」を一覧表示します。上の検索欄からリアルタイムに絞り込めます。
+          </p>
+        </div>
+      </div>
+
+      <div class="sidebar-footer">
+        <span><kbd>/</kbd> 検索</span>
+        <span><kbd>Esc</kbd> 閉じる/クリア</span>
+        <span><kbd>←</kbd><kbd>→</kbd> 前後移動</span>
+      </div>
+    </aside>
+
+    <!-- =================================================================
+         RIGHT PANE: Full-Height High-Density Results List
+         ================================================================= -->
+    <main class="main-pane">
+      <!-- Glossary View -->
+      <section id="glossaryView" class="pane-section">
+        <div class="list-toolbar">
+          <div class="results-summary" id="resultsSummary" aria-live="polite"></div>
+
+          <div class="toolbar-right">
+            <label for="sortSelect" class="sr-only">並び順</label>
+            <select id="sortSelect" class="compact-select" aria-label="並び順">
+              <option value="relevance">関連度順</option>
+              <option value="chapter">章・番号順</option>
+              <option value="title">見出し名順</option>
+            </select>
+
+            <div class="layout-toggle" role="group" aria-label="表示密度">
+              <button type="button" class="layout-btn is-active" data-layout="list" title="一覧表示（見出し＋キーワード）">一覧</button>
+              <button type="button" class="layout-btn" data-layout="compact" title="超圧縮1行表示（最多件数を一度に表示）">超圧縮</button>
+              <button type="button" class="layout-btn" data-layout="detail" title="全文展開表示">全文</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Column Header (visible in list / compact views on desktop) -->
+        <div class="list-col-header" id="listColHeader" aria-hidden="true">
+          <span class="col-h-ch">章 / #</span>
+          <span class="col-h-term">用語・別名</span>
+          <span class="col-h-kw">ポイントキーワード（クリックで絞り込み）</span>
+          <span class="col-h-act">状態</span>
+        </div>
+
+        <div class="entries-list layout-list" id="cardsContainer"></div>
+
+        <div class="load-more-wrap" id="loadMoreWrap" hidden>
+          <span class="load-more-info" id="loadMoreInfo"></span>
+          <div class="load-more-actions">
+            <button type="button" class="secondary-btn" id="loadMoreBtn">さらに表示</button>
+            <button type="button" class="ghost-btn" id="loadAllBtn">残りをすべて表示</button>
+          </div>
+        </div>
+
+        <div class="empty-state" id="emptyState" hidden>
+          <div class="empty-icon" aria-hidden="true">🔍</div>
+          <h2>一致するワードが見つかりませんでした</h2>
+          <p id="emptyStateDesc">別のキーワードを試すか、検索対象・章フィルタを緩めてみてください。</p>
+          <button type="button" class="primary-btn" id="emptyResetBtn">検索とフィルタをリセット</button>
+        </div>
+      </section>
+
+      <!-- Appendix Comparison Table View -->
+      <section id="appendixView" class="pane-section" hidden>
+        <div class="list-toolbar">
+          <div class="results-summary" id="appendixSummary"></div>
+        </div>
+        <div class="appendix-table-wrap">
+          <table class="appendix-table">
+            <thead>
+              <tr>
+                <th class="th-num">#</th>
+                <th class="th-theme">比較テーマ</th>
+                <th>用語A（特徴）</th>
+                <th>用語B（特徴）</th>
+                <th>用語C（特徴）</th>
+              </tr>
+            </thead>
+            <tbody id="appendixContainer"></tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Term Detail Modal -->
+  <div class="modal-backdrop" id="detailModal" hidden role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="modal-panel" id="modalPanel">
+      <header class="modal-header">
+        <div class="modal-meta-row">
+          <span class="chapter-badge" id="modalChapter"></span>
+          <span class="entry-id-tag" id="modalId"></span>
+          <span class="match-tier-badge" id="modalMatchBadge" hidden></span>
+        </div>
+        <div class="modal-header-actions">
+          <button type="button" class="action-chip" id="modalBookmarkBtn" title="要復習ブックマーク">☆ 要復習</button>
+          <button type="button" class="action-chip" id="modalMasteredBtn" title="習得済みチェック">○ 習得</button>
+          <button type="button" class="action-chip" id="modalCopyBtn" title="この語の解説をコピー">📋 コピー</button>
+          <button type="button" class="modal-close-btn" id="modalCloseBtn" aria-label="閉じる">✕</button>
+        </div>
+      </header>
+
+      <div class="modal-body" id="modalBody">
+        <h2 class="modal-title" id="modalTitle"></h2>
+        <p class="modal-aliases" id="modalAliases" hidden></p>
+
+        <div class="modal-section section-keywords">
+          <div class="section-heading">
+            <span class="section-dot dot-kw"></span>
+            <h3>ポイントキーワード</h3>
+            <span class="section-hint">クリックで関連語を検索</span>
+          </div>
+          <div class="kw-pills modal-kw-pills" id="modalKeywords"></div>
+        </div>
+
+        <div class="modal-section section-definition">
+          <div class="section-heading">
+            <span class="section-dot dot-def"></span>
+            <h3>定義・意味</h3>
+          </div>
+          <div class="rich-text" id="modalDefinition"></div>
+        </div>
+
+        <div class="modal-section section-features">
+          <div class="section-heading">
+            <span class="section-dot dot-feat"></span>
+            <h3>主な特徴</h3>
+          </div>
+          <div class="rich-text" id="modalFeatures"></div>
+        </div>
+
+        <div class="modal-section section-related">
+          <div class="section-heading">
+            <span class="section-dot dot-rel"></span>
+            <h3>関連ワード・試験ポイント</h3>
+          </div>
+          <div class="rich-text" id="modalRelated"></div>
+        </div>
+
+        <div class="modal-section section-pitfalls">
+          <div class="section-heading">
+            <span class="section-dot dot-trap"></span>
+            <h3>よく間違いやすいポイント（混同注意）</h3>
+          </div>
+          <div class="rich-text" id="modalPitfalls"></div>
+        </div>
+      </div>
+
+      <footer class="modal-footer">
+        <button type="button" class="nav-btn" id="modalPrevBtn">← 前の語</button>
+        <span class="modal-position" id="modalPosition">1 / 721</span>
+        <button type="button" class="nav-btn" id="modalNextBtn">次の語 →</button>
+      </footer>
+    </div>
+  </div>
+
+  <!-- Toast notification -->
+  <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+
+  <!-- Scroll to top button -->
+  <button type="button" class="scroll-top-btn" id="scrollTopBtn" aria-label="先頭へ戻る" hidden>↑</button>
+
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" crossorigin="anonymous"></script>
+  <script src="data/glossary-data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
